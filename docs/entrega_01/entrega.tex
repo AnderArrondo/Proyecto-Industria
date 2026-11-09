@@ -2,8 +2,10 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{amsfonts}
 \usepackage{graphicx}
 \usepackage{geometry}
+\usepackage{hyperref}
 \usepackage{setspace}
 \usepackage{titling}
 \usepackage{float}
@@ -24,7 +26,7 @@
 
     \vspace*{1.5cm}
 
-    {\Huge \bfseries Mantenimiento basado en la condición de las plantas propulsoras navales.\par}
+    {\Huge \bfseries Mantenimiento basado en la condición de las plantas propulsoras navales\par}
 
     \vspace{0.35cm}
 
@@ -84,7 +86,7 @@
 
 \section{Introducción}
   % Introducción de la temática a tratar.
-  Según la \textit{Organización Mundial del Comercio} (OMC) el transporte marítimo representa más del 80\% del volumen del comercio mundial. Esto es, una gran mayoría de los bienes comerciales son suministrados a través del mar, de tal manera que este método de transporte constituye la columna vertebral de las cadenas de suministro mundiales.~\cite{condition_based_maintenance_of_naval_propulsion_plants_316}
+  Según la \textit{Organización Mundial del Comercio} (OMC) el transporte marítimo representa más del 80\% del volumen del comercio mundial. Esto es, una gran mayoría de los bienes comerciales son suministrados a través del mar, de tal manera que este método de transporte constituye la columna vertebral de las cadenas de suministro mundiales.~\cite{wto_maritime_transport_services}
   
   Los cargueros navales son propulsados por maquinarias (véase la Figura~\ref{fig:estructura-propulsor}) que han de resistir grandes fuerzas y vibraciones por parte del oleaje durante largos viajes y empujar masas de tamaño considerable a través de las aguas. En consecuencia, es imperativo asegurarse de la durabilidad y el correcto funcionamiento de los propulsores. En caso contrario, muchos barcos transportadores quedarían a la deriva interrumpiendo el comercio global y generando escasez en muchos sectores críticos de la economía.
 
@@ -92,12 +94,84 @@
   % Origen del conjunto de datos (¿de dónde se ha obtenido?), el tipo de datos que contiene (¿cómo
   % están estructurados? ¿Qué tamaño tiene el dataset?), así como el contexto (¿qué representa?, ¿en
   % qué circunstancias o escenarios industriales se recopilaron estos datos?)
+  La fuente de los datos reside en el repositorio de aprendizaje automático \textit{UC Irvine}, una colección de bases de datos, teorías de dominio y generadores de datos utilizados por la comunidad de aprendizaje automático para el análisis empírico de algoritmos de ML.~\cite{kelly2023uci}
+
+  El dataset, titulado como ``\textit{Condition Based Maintenance of Naval Propulsion Plants}'' fue donado al repositorio en octubre de 2014. Los datos fueron generados mediante un simulador avanzado de una turbina de gas (GT, véase la Sección~\ref{sec:gt} para más detalles), instalada en una fragata caracterizada por disponer de una planta propulsora de tipo CODLAG (Combined Diesel-Electric and Gas), que combina propulsión diésel-eléctrica y de turbina de gas (funcionamiento detallado en la Sección~\ref{sec:codlag}).~\cite{condition_based_maintenance_of_naval_propulsion_plants_316}
+  \subsubsection{Detalles de la adquisición de datos}
+    Las pruebas se realizaron con un simulador numérico de un buque tipo fragata, dotado de un sistema de propulsión que utilizaba una turbina de gas (GT). Los diferentes módulos del simulador completo (hélice, casco, turbina de gas, caja de engranajes y controlador) se diseñaron y calibraron durante años tomando como referencia diversas plantas propulsoras reales con características semejantes. Según estas observaciones, los datos disponibles muestran un comportamiento acorde con el de un buque real.~\cite{condition_based_maintenance_of_naval_propulsion_plants_316}
+
+    El funcionamiento del sistema propulsor se describió a partir de los siguientes parámetros:
+    \begin{itemize}
+      \item Velocidad del buque, definida como una función lineal de la posición de la palanca ($lp$).
+      \item Coeficiente de degradación del compresor ($k_{Mc}$).
+      \item Coeficiente de degradación de la turbina ($k_{Mt}$).
+    \end{itemize}
+
+    Consequentemente, cada estado posible de deterioro queda definido por una combinación de estos tres parámetros (Ecuación~\ref{eq:estado}):
+
+    \begin{equation}
+      \label{eq:estado}
+      (lp, k_{Mt}, k_{Mc})
+    \end{equation}
+
+    Los intervalos de degradación del compresor y la turbina se discretizaron con una malla uniforme de resolución $0. 001$, a fin de representar con suficiente detalle los diferentes estados de degradación. Para el compresor, se tomó el coeficiente $k_{Mc}$ en el intervalo $[0. 95, 1]$, mientras que el de la turbina, $k_{Mt}$, se estableció en el intervalo $[0. 975, 1]$. En cuanto a la velocidad del buque, se analizó el rango operativo de $3$ a $27$ nudos, con incrementos de $3$ nudos. Esto es, se pueden generar $51 \times 26 \times 9 = 11 \, 934$ combinaciones diferentes de estados, que coincide con el número de filas del dataset.
+    
+  \subsubsection{Estructura y contenido}
+    La estructura de datos consta de dos archivos:  \texttt{Features.txt} y \texttt{data.txt}. En el primero, se detallan las dieciseis variables que componen un registro de la base de datos (descripción, abreviatura y unidad métrica), junto a dos variables objetivo que miden la degradación. El segundo, por otro lado, contiene todos los registros documentados con cerca de doce mil observaciones (11934 filas). De esta manera, la dimensionalidad del conjunto de datos se representa de la siguiente forma (Ecuación~\ref{eq:dimensinalidad}):
+
+    \begin{equation}
+      \label{eq:dimensinalidad}
+      \mathbf{X} \in \mathbb{R}^{11934 \times 16},
+      \qquad
+      \mathbf{y} \in \mathbb{R}^{11934 \times 2}
+    \end{equation}
+
+    El archivo \texttt{data.txt} sigue un formato de texto plano con valores numéricos separados por espacios en blanco (\textit{whitespace-delimited format}). Cabe mencionar que los datos no están normalizados, sino que son mediciones brutas del simulador generativo. La Tabla~\ref{tab:variables} muestra la información extraida de \texttt{Features.txt}, que detalla información de las variables de estudio y predicción, además de el orden de aparición en el fichero de datos.
+    
+    \begin{table}[htbp]
+    \centering
+    \caption{Descripción de las variables del conjunto de datos.}
+    \label{tab:variables}
+    \begin{tabular}{c l c l c}
+        \hline
+        \textbf{N.º} & \textbf{Variable} & \textbf{Abreviatura} & \textbf{Unidad} & \textbf{Tipo} \\
+        \hline
+        1  & Posición de la palanca & lp & -- & Entrada \\
+        2  & Velocidad del buque & v & nudos & Entrada \\
+        3  & Par del eje de la turbina de gas & GTT & kN\,m & Entrada \\
+        4  & Velocidad de rotación de la turbina de gas & GTn & rpm & Entrada \\
+        5  & Velocidad de rotación del generador de gas & GGn & rpm & Entrada \\
+        6  & Par de la hélice de estribor & Ts & kN & Entrada \\
+        7  & Par de la hélice de babor & Tp & kN & Entrada \\
+        8  & Temperatura de salida de la turbina de alta presión & T48 & $^\circ$C & Entrada \\
+        9  & Temperatura del aire a la entrada del compresor & T1 & $^\circ$C & Entrada \\
+        10 & Temperatura del aire a la salida del compresor & T2 & $^\circ$C & Entrada \\
+        11 & Presión de salida de la turbina de alta presión & P48 & bar & Entrada \\
+        12 & Presión del aire a la entrada del compresor & P1 & bar & Entrada \\
+        13 & Presión del aire a la salida del compresor & P2 & bar & Entrada \\
+        14 & Presión de los gases de escape de la turbina de gas & Pexh & bar & Entrada \\
+        15 & Control de inyección de la turbina & TIC & \% & Entrada \\
+        16 & Caudal másico de combustible & mf & kg/s & Entrada \\
+        \hline
+        17 & Coeficiente de degradación del compresor & -- & -- & Objetivo \\
+        18 & Coeficiente de degradación de la turbina & -- & -- & Objetivo \\
+        \hline
+    \end{tabular}
+\end{table}
 
 \section{Sobre el dominio}
   % Contextualización del conjunto de datos (¿qué eventos o tendencias industriales llevaron a su
   % creación o necesidad?) y terminología (¿qué conceptos se deben comprender? - definición y
   % descripción de los términos clave relacionados con el conjunto de datos).
+  \subsection{Componentes y funcionamiento de un propulsor}
 
+  \subsection{Glosario}
+    \subsubsection{Turbinas de gas}
+    \label{sec:gt}
+    
+    \subsubsection{CODLAG}
+    \label{sec:codlag}
+    
 \section{Definición del problema}
   % Enfoque del estudio de los datos (¿qué problema específico se propone resolver o responder con este
   % conjunto de datos?), justificación (¿por qué es relevante o crítico abordar este problema en el
@@ -117,7 +191,7 @@
   % (no tanto las técnicas, si no su planteamiento desde el punto de vista de input/output)... En definitiva,
   % el proceso que se espera seguir en el análisis de los datos. 
 
-\bibliographystyle{plain}
+\bibliographystyle{unsrt}
 \bibliography{references}
 
 \end{document}
