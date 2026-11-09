@@ -1,0 +1,40 @@
+
+# ==============================
+# Python
+# ==============================
+__pycache__/
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# ==============================
+# LaTeX
+# ==============================
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.xdv
+
+# Archivos PDF generados
+*.pdf
+
+# ==============================
+# Editores
+# ==============================
+.vscode/
+
