@@ -26,4 +26,4 @@ env/
 *.pdf
 
 .vscode/
-.lattedit
+.lattedit/
