@@ -1,3 +1,4 @@
+
 \documentclass[a4paper]{article}
 
 \usepackage[utf8]{inputenc}
@@ -9,6 +10,7 @@
 \usepackage{setspace}
 \usepackage{titling}
 \usepackage{float}
+\usepackage{fancyhdr}
 
 
 \geometry{margin=2.5cm}
@@ -19,7 +21,16 @@
 \renewcommand{\tablename}{Tabla}
 \renewcommand{\refname}{Referencias}
 
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Mantenimiento basado en la condición}
+\fancyhead[R]{\small Analítica de Datos para la Industria}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\headheight}{15pt}
 \begin{document}
+\hypersetup{pageanchor=false}
+\pagenumbering{gobble}
 
 \begin{titlepage}
     \centering
@@ -80,8 +91,10 @@
 \end{titlepage}
 
 \tableofcontents
-
-\newpage
+\thispagestyle{empty}
+\clearpage
+\pagenumbering{arabic}
+\hypersetup{pageanchor=true}
 
 
 \section{Introducción}
@@ -132,6 +145,7 @@
     \centering
     \caption{Descripción de las variables del conjunto de datos.}
     \label{tab:variables}
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{c l c l c}
         \hline
         \textbf{N.º} & \textbf{Variable} & \textbf{Abreviatura} & \textbf{Unidad} & \textbf{Tipo} \\
@@ -156,7 +170,8 @@
         17 & Coeficiente de degradación del compresor & -- & -- & Objetivo \\
         18 & Coeficiente de degradación de la turbina & -- & -- & Objetivo \\
         \hline
-    \end{tabular}
+    \end{tabular}%
+    }
 \end{table}
 
 \section{Sobre el dominio}
@@ -176,11 +191,27 @@
   % Enfoque del estudio de los datos (¿qué problema específico se propone resolver o responder con este
   % conjunto de datos?), justificación (¿por qué es relevante o crítico abordar este problema en el
   % contexto industrial actual?)
+El mantenimiento de las turbinas de gas en los sistemas de propulsión naval es fundamental para garantizar el funcionamiento eficiente y seguro del buque. Con el uso, el compresor y la turbina pueden sufrir un deterioro progresivo que reduzca su rendimiento y aumente el consumo de combustible. Si este desgaste no se detecta a tiempo, puede provocar pérdidas de rendimiento importantes y averías más graves.
+
+Para abordar este problema, proponemos predecir los índices de degradación del compresor y de la turbina a partir de variables de funcionamiento como las temperaturas, las presiones, las revoluciones y el caudal de combustible. Estas mediciones reflejan tanto el estado de los componentes como las condiciones de operación, por lo que será necesario tener en cuenta, entre otros factores, la velocidad del buque al interpretar sus cambios. Las predicciones permitirían estimar el estado de ambos componentes y apoyar la planificación del mantenimiento antes de que el deterioro afecte de forma significativa a la operación del buque.
 
 \section{Objetivos e hipótesis}
   % Planteamiento de que se pretende abordar (¿qué se espera descubrir o inferir de este conjunto de
   % datos?), plantear posibles causas para la problemática a abordar en función de lo que se esté
   % estudiando, objetivos del estudio. 
+Nuestro objetivo es estimar con precisión la degradación de una turbina de gas mediante la predicción de los índices de degradación de la turbina y del compresor, de modo que sea posible planificar y realizar el mantenimiento de forma eficiente.
+
+Para concretar este objetivo, se plantea:
+\begin{itemize}
+  \item Estimar por separado los coeficientes de degradación del compresor y de la turbina a partir de las variables de funcionamiento disponibles.
+  \item Comparar los errores de predicción en estados de deterioro incipiente y avanzado, teniendo en cuenta las condiciones de operación.
+  \item Evaluar hasta qué punto las estimaciones podrían servir de apoyo a la planificación del mantenimiento.
+\end{itemize}
+
+Nuestra hipótesis es que será posible predecir con mayor precisión la degradación de las turbinas que presentan un deterioro avanzado, mientras que la precisión disminuirá notablemente en aquellas cuyo deterioro se encuentre en una fase incipiente. Esta hipótesis se contrastará comparando los errores en ambos grupos, sin dar por supuesto que el patrón se cumple.
+
+\subsection{Indicadores de evaluación}
+Como criterio proponemos calcular el error absoluto medio (MAE) por separado para cada coeficiente sobre un conjunto de prueba reservado. El objetivo es alcanzar un MAE igual o inferior a $0.01$ en cada uno.
 
 \section{Metodología propuesta}
   % Aunque no se realizará un análisis práctico en esta etapa, describir las técnicas o enfoques analíticos
@@ -191,7 +222,19 @@
   % (no tanto las técnicas, si no su planteamiento desde el punto de vista de input/output)... En definitiva,
   % el proceso que se espera seguir en el análisis de los datos. 
 
+\subsection{Planificación}
+Para garantizar que podamos lograr todas las metas del trabajo, seguiremos una planificación por plazos. La planificación que seguiremos se describe mediante el siguiente diagrama.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{diagrama_gantt.png}
+  \caption{Planificación propuesta de las tareas del proyecto.}
+  \label{fig:gantt}
+\end{figure}
+
+\section{Uso de inteligencia artificial}
+
 \bibliographystyle{unsrt}
 \bibliography{references}
 
 \end{document}
+end{document}
