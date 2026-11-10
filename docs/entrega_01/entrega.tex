@@ -163,14 +163,34 @@
   % Contextualización del conjunto de datos (¿qué eventos o tendencias industriales llevaron a su
   % creación o necesidad?) y terminología (¿qué conceptos se deben comprender? - definición y
   % descripción de los términos clave relacionados con el conjunto de datos).
+  
   \subsection{Componentes y funcionamiento de un propulsor}
-
-  \subsection{Glosario}
-    \subsubsection{Turbinas de gas}
-    \label{sec:gt}
+ Antes de empezar creando modelos o calculando datos de fragatas pensamos que es indispensable entender los conceptos fundamentales de nuestro dominio, ya que si no comprendemos bien, en nuestro caso, como funciona un motor CODLAG no vamos a entender ni vamos a saber interpretar los resultados. Primero definiremos un poco el funcionamiento de los motores y de donde salen las variables mencionadas anteriormente.
     
     \subsubsection{CODLAG}
     \label{sec:codlag}
+    CODLAG son las siglas de COmbined Diesel-eLectric And Gas, y hace referencia a un motor que híbrida entre estos tres modos. Esto permite a la fragata ser eficiente tanto en bajas, medias y altas velocidad, lo que la hace versátil para muchas operaciones. Los dos modos de operación son el modo diésel-eléctrico el de turbina de gas.
+    
+    \subsubsection{Modo Diésel-eléctrico}
+    \label{sec:de}
+    En nuestro caso serán cuatro generadores diésel los que produzcan la energía eléctrica para los dos motores de propulsión, aunque depende de el motor, la mayoría de veces sera corriente alterna la que sea generada.
+    
+    Este modo es especialmente eficiente para mantener velocidades de crucero normales, además ya que es posible controlar la energía generada, podemos variar la producción y encender/apagar los 4 motores de manera independiente, lo que aumenta la eficiencia de nuestro motor y por lo tanto, de nuestra embarcación.
+    
+    Otro uso de este modo es que al ser un motor diésel-eléctrico es mucho mas silencioso que la alternativa del modo turbina de gas, por lo que se puede usar cuando, sea por la razón que sea, necesitamos ser silenciosos. Aunque para una fragata no sea un punto clave, el poco ruido que hace es la razón principal por la que se usa en la mayoría de submarinos.\cite{cipollini2018condition}
+    
+    
+    \subsubsection{Turbinas de gas}
+    \label{sec:gt}
+    Cuando la situación lo requiere, las turbinas de gas son activadas para dar a la fragata la velocidad y aceleración necesarias. 
+    
+    Estas turbinas se componen de un compresor que aumenta la presión del aire, las variables T1(temperatura de entrada), T2(temperatura de salida), P1(presión de entrada) y P2(presión de salida) de nuestros datos hacen referencia a este compresor.
+    
+    Una vez el aire esta comprimido, este se traslada a una cámara de combustión que inyecta el combustible, aquí es donde nuestras variables TIC(\% apertura de la compuerta de combustible) y mf (caudal másico de combustible) controlan cuanto combustible entra a la cámara de combustión.
+    
+    Los gases generados en la cámara de combustión pasan primero por una turbina de alta presión, esta esta conectada con un eje al compresor del principio y permite permite que el este siga girando. Las variables P48, G48 y GGn nos indican la presión de salida, temperatura de salida y las revoluciones por minuto(rpm) del eje interno respectivamente.
+    
+    Finalmente, los gases llegan a la turbina de potencia que es la que los convierte en fuerza para mover el barco. Esta aprovecha tanto la energía térmica como la presión de estos gases para hacer girar el eje externo que esta conectado a la hélice del barco. Las variables GTn(rpm del eje exterior) y GTT(par de eje de la turbina) nos dan la información completa de cuánto y con cuanta fuerza se va a mover la hélice y por lo tanto el barco.\cite{saravanamuttoo2017gas}
     
 \section{Definición del problema}
   % Enfoque del estudio de los datos (¿qué problema específico se propone resolver o responder con este
