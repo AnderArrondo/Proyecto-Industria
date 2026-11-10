@@ -11,6 +11,7 @@
 \usepackage{titling}
 \usepackage{float}
 \usepackage{fancyhdr}
+\usepackage{amsmath}
 
 
 \geometry{margin=2.5cm}
@@ -78,12 +79,12 @@
         \vspace{0.3cm}
 
         \small
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        Este articulo documenta el problema industrial que se pretende resolver, información relativa a la temática en cuestión, el origen y estructura de los datos adquiridos y una hoja de ruta sobre cómo pretendemos resolver dicha problemática. Finalmente, se proporciona un planificación ideal para el cumplimiento de cada etapa del proyecto.
     \end{minipage}
     
     \begin{figure}[H]
       \centering
-      \includegraphics[width=0.8\textwidth]{media/naval_propulsion_plant.jpg}
+      \includegraphics[width=0.85\textwidth]{media/naval_propulsion_plant.jpg}
       \caption{Ejemplo de la estructura de un propulsor naval.~\cite{wartsila_rina_novel_propulsion_arrangement_2021}}
       \label{fig:estructura-propulsor}
     \end{figure}
@@ -120,26 +121,27 @@
       \item Coeficiente de degradación de la turbina ($k_{Mt}$).
     \end{itemize}
 
-    Consequentemente, cada estado posible de deterioro queda definido por una combinación de estos tres parámetros (Ecuación~\ref{eq:estado}):
+    Consecuentemente, cada estado posible de deterioro queda definido por una combinación de estos tres parámetros (Ecuación~\ref{eq:estado}):
 
     \begin{equation}
       \label{eq:estado}
-      (lp, k_{Mt}, k_{Mc})
+      (lp, \, k_{Mt}, \, k_{Mc})
     \end{equation}
 
     Los intervalos de degradación del compresor y la turbina se discretizaron con una malla uniforme de resolución $0. 001$, a fin de representar con suficiente detalle los diferentes estados de degradación. Para el compresor, se tomó el coeficiente $k_{Mc}$ en el intervalo $[0. 95, 1]$, mientras que el de la turbina, $k_{Mt}$, se estableció en el intervalo $[0. 975, 1]$. En cuanto a la velocidad del buque, se analizó el rango operativo de $3$ a $27$ nudos, con incrementos de $3$ nudos. Esto es, se pueden generar $51 \times 26 \times 9 = 11 \, 934$ combinaciones diferentes de estados, que coincide con el número de filas del dataset.
     
   \subsubsection{Estructura y contenido}
-    La estructura de datos consta de dos archivos:  \texttt{Features.txt} y \texttt{data.txt}. En el primero, se detallan las dieciseis variables que componen un registro de la base de datos (descripción, abreviatura y unidad métrica), junto a dos variables objetivo que miden la degradación. El segundo, por otro lado, contiene todos los registros documentados con cerca de doce mil observaciones (11934 filas). De esta manera, la dimensionalidad del conjunto de datos se representa de la siguiente forma (Ecuación~\ref{eq:dimensinalidad}):
+  \label{sec:estructura-contenido}
+    La estructura de datos consta de dos archivos:  \texttt{Features.txt} y \texttt{data.txt}. En el primero, se detallan las dieciséis variables que componen un registro de la base de datos (descripción, abreviatura y unidad métrica), junto a dos variables objetivo que miden la degradación. El segundo, por otro lado, contiene todos los registros documentados con cerca de doce mil observaciones (11934 filas). De esta manera, la dimensionalidad del conjunto de datos se representa de la siguiente forma (Ecuación~\ref{eq:dimensinalidad}):
 
     \begin{equation}
       \label{eq:dimensinalidad}
-      \mathbf{X} \in \mathbb{R}^{11934 \times 16},
+      \mathbf{X} \in \mathbb{R}^{11\,934 \times 16},
       \qquad
-      \mathbf{y} \in \mathbb{R}^{11934 \times 2}
+      \mathbf{y} \in \mathbb{R}^{11\,934 \times 2}
     \end{equation}
 
-    El archivo \texttt{data.txt} sigue un formato de texto plano con valores numéricos separados por espacios en blanco (\textit{whitespace-delimited format}). Cabe mencionar que los datos no están normalizados, sino que son mediciones brutas del simulador generativo. La Tabla~\ref{tab:variables} muestra la información extraida de \texttt{Features.txt}, que detalla información de las variables de estudio y predicción, además de el orden de aparición en el fichero de datos.
+    El archivo \texttt{data.txt} sigue un formato de texto plano con valores numéricos separados por espacios en blanco (\textit{whitespace-delimited format}). Cabe mencionar que los datos no están normalizados, sino que son mediciones brutas del simulador generativo. La Tabla~\ref{tab:variables} muestra la información extraída de \texttt{Features.txt}, que detalla información de las variables de estudio y predicción, además del orden de aparición en el fichero de datos.
     
     \begin{table}[htbp]
     \centering
@@ -184,28 +186,42 @@
     
     \subsubsection{CODLAG}
     \label{sec:codlag}
-    CODLAG son las siglas de COmbined Diesel-eLectric And Gas, y hace referencia a un motor que híbrida entre estos tres modos. Esto permite a la fragata ser eficiente tanto en bajas, medias y altas velocidad, lo que la hace versátil para muchas operaciones. Los dos modos de operación son el modo diésel-eléctrico el de turbina de gas.
+    CODLAG son las siglas de COmbined Diesel-eLectric And Gas, y hace referencia a un motor que hibrida entre estos tres modos. Esto permite a la fragata ser eficiente tanto en bajas, medias y altas velocidad, lo que la hace versátil para muchas operaciones. Los dos modos de operación son el modo diésel-eléctrico el de turbina de gas. La Figura~\ref{fig:esquema-codlag} ilustra de manera esquemática la estructura central del concepto.
+
+    \begin{figure}
+      \centering
+      \includegraphics[width=0.8\textwidth]{media/codlag.png}
+      \caption{Esquema de un sistema de propulsión CODLAG.~\cite{eswiki:155303009}}
+      \label{fig:esquema-codlag}
+    \end{figure}
     
     \subsubsection{Modo Diésel-eléctrico}
     \label{sec:de}
-    En nuestro caso serán cuatro generadores diésel los que produzcan la energía eléctrica para los dos motores de propulsión, aunque depende de el motor, la mayoría de veces sera corriente alterna la que sea generada.
+    En nuestro caso serán cuatro generadores diésel los que produzcan la energía eléctrica para los dos motores de propulsión, aunque depende del motor, la mayoría de las veces será corriente alterna la que sea generada.
     
     Este modo es especialmente eficiente para mantener velocidades de crucero normales, además ya que es posible controlar la energía generada, podemos variar la producción y encender/apagar los 4 motores de manera independiente, lo que aumenta la eficiencia de nuestro motor y por lo tanto, de nuestra embarcación.
     
-    Otro uso de este modo es que al ser un motor diésel-eléctrico es mucho mas silencioso que la alternativa del modo turbina de gas, por lo que se puede usar cuando, sea por la razón que sea, necesitamos ser silenciosos. Aunque para una fragata no sea un punto clave, el poco ruido que hace es la razón principal por la que se usa en la mayoría de submarinos.\cite{cipollini2018condition}
+    Otro uso de este modo es que al ser un motor diésel-eléctrico es mucho más silencioso que la alternativa del modo turbina de gas, por lo que se puede usar cuando, sea por la razón que sea, necesitamos ser silenciosos. Aunque para una fragata no sea un punto clave, el poco ruido que hace es la razón principal por la que se usa en la mayoría de submarinos.\cite{cipollini2018condition}
     
     
     \subsubsection{Turbinas de gas}
     \label{sec:gt}
     Cuando la situación lo requiere, las turbinas de gas son activadas para dar a la fragata la velocidad y aceleración necesarias. 
     
-    Estas turbinas se componen de un compresor que aumenta la presión del aire, las variables T1(temperatura de entrada), T2(temperatura de salida), P1(presión de entrada) y P2(presión de salida) de nuestros datos hacen referencia a este compresor.
+    Estas turbinas se componen de un compresor que aumenta la presión del aire, las variables T1 (temperatura de entrada), T2 (temperatura de salida), P1 (presión de entrada) y P2 (presión de salida) de nuestros datos hacen referencia a este compresor.
     
-    Una vez el aire esta comprimido, este se traslada a una cámara de combustión que inyecta el combustible, aquí es donde nuestras variables TIC(\% apertura de la compuerta de combustible) y mf (caudal másico de combustible) controlan cuanto combustible entra a la cámara de combustión.
+    Una vez el aire está comprimido, este se traslada a una cámara de combustión que inyecta el combustible, aquí es donde nuestras variables TIC(\% apertura de la compuerta de combustible) y mf (caudal másico de combustible) controlan cuánto combustible entra a la cámara de combustión.
     
-    Los gases generados en la cámara de combustión pasan primero por una turbina de alta presión, esta esta conectada con un eje al compresor del principio y permite permite que el este siga girando. Las variables P48, G48 y GGn nos indican la presión de salida, temperatura de salida y las revoluciones por minuto(rpm) del eje interno respectivamente.
+    Los gases generados en la cámara de combustión pasan primero por una turbina de alta presión, esta está conectada con un eje al compresor del principio y permite que el este siga girando. Las variables P48, G48 y GGn nos indican la presión de salida, temperatura de salida y las revoluciones por minuto (rpm) del eje interno respectivamente.
     
-    Finalmente, los gases llegan a la turbina de potencia que es la que los convierte en fuerza para mover el barco. Esta aprovecha tanto la energía térmica como la presión de estos gases para hacer girar el eje externo que esta conectado a la hélice del barco. Las variables GTn(rpm del eje exterior) y GTT(par de eje de la turbina) nos dan la información completa de cuánto y con cuanta fuerza se va a mover la hélice y por lo tanto el barco.\cite{saravanamuttoo2017gas}
+    Finalmente, los gases llegan a la turbina de potencia que es la que los convierte en fuerza para mover el barco. Esta aprovecha tanto la energía térmica como la presión de estos gases para hacer girar el eje externo que está conectado a la hélice del barco. Las variables GTn(rpm del eje exterior) y GTT(par de eje de la turbina) nos dan la información completa de cuánto y con cuánta fuerza se va a mover la hélice y por lo tanto el barco. Este proceso queda resumido en el diagrama de la Figura~\ref{fig:diag-turbina-gas}.~\cite{saravanamuttoo2017gas}
+
+    \begin{figure}
+      \centering
+      \includegraphics[width=0.8\textwidth]{media/diagrama-turbina.png}
+      \caption{Diagrama del funcionamiento de una turbina de gas.~\cite{jet_engine_spanish}}
+      \label{fig:diag-turbina-gas}
+    \end{figure}
     
 \section{Definición del problema}
   % Enfoque del estudio de los datos (¿qué problema específico se propone resolver o responder con este
@@ -215,7 +231,7 @@ El mantenimiento de las turbinas de gas en los sistemas de propulsión naval es 
 
 Para abordar este problema, proponemos predecir los índices de degradación del compresor y de la turbina a partir de variables de funcionamiento como las temperaturas, las presiones, las revoluciones y el caudal de combustible. Estas mediciones reflejan tanto el estado de los componentes como las condiciones de operación, por lo que será necesario tener en cuenta, entre otros factores, la velocidad del buque al interpretar sus cambios. Las predicciones permitirían estimar el estado de ambos componentes y apoyar la planificación del mantenimiento antes de que el deterioro afecte de forma significativa a la operación del buque.
 
-\section{Objetivos e hipótesis}
+\subsection{Objetivos e hipótesis}
   % Planteamiento de que se pretende abordar (¿qué se espera descubrir o inferir de este conjunto de
   % datos?), plantear posibles causas para la problemática a abordar en función de lo que se esté
   % estudiando, objetivos del estudio. 
@@ -241,10 +257,49 @@ Como criterio proponemos calcular el error absoluto medio (MAE) por separado par
   % distribuciones…), posibles modelos estrategias de análisis en función e los datos de los que se dispone
   % (no tanto las técnicas, si no su planteamiento desde el punto de vista de input/output)... En definitiva,
   % el proceso que se espera seguir en el análisis de los datos. 
+  Este apartado trata de explicar los pasos que transformarán los datos en crudo que poseemos actualmente a modelos predictivos confiables y certeros. A continuación se detalla este proceso paso a paso.
+  \subsection{Ingesta de datos}
+    Actualmente, los datos crudos están almacenados en un fichero de texto separados por espacios en blanco (véase la Sección~\ref{sec:estructura-contenido}). Pese a que es un formato estandarizado, consideramos que no es óptimo en cuanto a eficiencia de recursos (tanto espacio en disco, como velocidad de lectura). Por lo tanto, tras la primera lectura completa de los datos, estos se transformarán a un archivo \textit{parquet}, ya que este formato es más eficiente en términos de almacenamiento y rendimiento de lectura, gracias a su estructura en columnas y a los mecanismos de compresión que incorpora.
+    
+  \subsection{Análisis exploratorio}
+    Puesto que el dominio de los datos nos es en gran medida desconocido, procederemos con un análisis exploratorio de los datos. Esto implica investigar las interrelaciones entre variables, el escrutinio de valores atípicos, la identificación de posibles valores ausentes o inconsistencias, así como el estudio de las distribuciones individuales de las variables. La principal herramienta que se empleará para conseguir esto será la visualización de datos, ya sea a través de \textit{matplotlib}, \textit{seaborn}, \textit{streamlit}, etc.
+
+    Este análisis ofrecerá una perspectiva global de las características y la organización de los datos, permitirá detectar posibles problemas de calidad y establecer si hace falta aplicar transformaciones o limpiar la información antes de realizar análisis posteriores. Además, ayudará a reconocer patrones y relaciones relevantes que orienten las siguientes etapas del estudio.
+
+    Adicionalmente y considerando el número de características del conjunto de datos,  trataremos de establecer la importancia de cada variable para predecir la degradación del propulsor. En este respecto, es posible que, si se diese el caso, pudiésemos reducir la dimensionalidad a fin de reducir el ruido y ganar eficiencia computacional. Esto se abordará con algoritmos de clustering y reducción de dimensionalidad como podrían ser \textit{t-SNE}, \textit{UMAP}, \textit{PCA}, entre otros.
+
+    Pese a que esta fase se centra en la examinación de los datos, las conclusiones que se extraigan de las mismas deberán tener un fundamento teórico. En caso contrario, se podrían tomar conclusiones precipitadas que entorpeciesen las futuras fases y los resultados. Es por esto que en esta fase también haremos hincapié en entender con profundidad las idiosincrasias del dominio a medida que exploremos las características presentes en la base de datos.
+    
+  \subsection{Preprocesamiento}
+    Tal y como se menciona en la Sección~\ref{sec:estructura-contenido}, los datos no están normalizados. Es posible que para ciertos algoritmos predictivos sea necesario estandarizar el rango de valores de entrada. Esto se puede lograr aplicando métodos como la estandarización (también denominada como Z-score) o la normalización min-max (detallados en la Ecuación~\ref{eq:estandarization}).
+
+    \begin{equation}
+      \label{eq:estandarization}
+      \begin{aligned}
+      \text{Estandarización (Z-score):} \quad
+      x' &= \frac{x-\mu}{\sigma} \\[10pt]
+      \text{Normalización (Min-Max):} \quad
+      x' &= \frac{x-x_{\min}}{x_{\max}-x_{\min}}
+      \end{aligned}
+    \end{equation}
+
+  Por otro lado, dependiendo de las distribuciones de valores en cada variable, podría surgir la necesidad de aplicar transformaciones que modifiquen los valores de entrada de los modelos predictivos con el fin de impulsar su rendimiento. Por ejemplo, un caso típico es el de las distribuciones asimétricas hacia la derecha. Estas distribuciones suelen corregirse aplicando el logaritmo o la raíz cuadrada para asemejarlas a distribuciones simétricas.
+
+  Una consideración importante para la interpretación de los datos es las unidades en las que se representan. La anterior Tabla~\ref{tab:variables} muestra las unidades que utiliza el dataset original. Sin embargo, algunas de estas unidades no son familiares por escapar del sistema métrico europeo, por lo que la conversión de estas variables a unidades más intuitivas para nuestra perspectiva sería recomendable. A modo de ejemplo, la velocidad del buque se mide en nudos, en lugar de metros por segundo (m/s, Sistema Internacional de Unidades) o kilómetros por hora (km/h).
+
+  Para poder obtener resultados robustos y sin sesgos, se dividirán los datos en tres categorías: set de entrenamiento, de validación y de testeo. En base al coste computacional de los algoritmos predictivos que se usen, se aplicarán (o no) técnicas de validación cruzada para la obtención de resultados. Nótese que esto antecede a algunas de las transformaciones mencionadas previamente como podría ser la estandarización, que debería de usar la media y desviación estándar del set de entrenamiento.
+
+  \subsection{Análisis predictivo}
+    La tarea principal del trabajo trata de predecir la degradación de la turbina. En consecuencia, los algoritmos predictivos que emplearemos serán de regresión. La hoja de ruta que hemos planteado en el equipo es la siguiente: primero, entrenar un modelo de regresión con un diseño fijo para poder usarlo a modo de referencia. Después, la optimización de hiperparámetros con herramientas como \textit{Optuna}, donde entre los hiperparámetros se incluyen distintos algoritmos como XGBoost, SVG, pequeñas redes neuronales...
+
+  \subsection{Evaluación y extracción de conclusiones}
+  Finalmente, se tratará de evaluar el rendimiento del modelo más prometedor en el set de validación a fin de verificar que el aprendizaje del modelo haya sido correcto. Las métricas que se recolecten en esta etapa serán utilizadas para extraer conclusiones sobre el cumplimiento de los objetivos declarados.
+
+  Adicionalmente, a pesar de que \textit{Optuna} ya ofrece algunas herramientas de analítica de datos para estimar la importancia de cada hiperparámetro y otras funcionalidades adicionales, si el tiempo lo permitiese, podría ser interesante tratar de ahondar en la explicabilidad del modelo, lo que contribuiría a la extracción de conclusiones más informadas. Dentro del alcance del trabajo este apartado queda como opcional y sujeto a las restricciones de tiempo. Bajo esta temática existen múltiples técnicas: \textit{SHAP}, \textit{PDP}, \textit{ALE}, \textit{LIME}... 
 
 \subsection{Planificación}
-Para garantizar que podamos lograr todas las metas del trabajo, seguiremos una planificación por plazos. La planificación que seguiremos se describe mediante el siguiente diagrama.
-\begin{figure}[htbp]
+Para garantizar que podamos lograr todas las metas del trabajo, seguiremos una planificación por plazos. La planificación que seguiremos se describe mediante el siguiente diagrama. Cabe mencionar, por supuesto, que este diagrama Gantt (Figura~\ref{fig:gantt}) es ideal y que por ende puede estar sujeto a revisiones en base a los problemas inesperados que nos podamos encontrar a lo largo del proceso.
+\begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{diagrama_gantt.png}
   \caption{Planificación propuesta de las tareas del proyecto.}
@@ -252,9 +307,17 @@ Para garantizar que podamos lograr todas las metas del trabajo, seguiremos una p
 \end{figure}
 
 \section{Uso de inteligencia artificial}
+  La utilización de la inteligencia artificial para este trabajo ha sido restringida a los siguientes roles:
+  
+  \begin{itemize}
+    \item Asistencia en la escritura del fichero LaTeX para su correcta formalización en el pdf resultante.
+    \item Resolvedor de dudas relacionadas con el dominio. Por ejemplo, aclarando conceptos como CODLAG o la estructura de propulsores navales.
+    \item Colaborador en la fase de \textit{brainstorming} para considerar múltiples puntos de vista sobre cómo guiar el trabajo. Nótese que las decisiones han sido tomadas con criterio propio por los integrantes del grupo exclusivamente.
+  \end{itemize}
+
+    Los proveedores de inteligencia artificial que se han usado para estas tareas son los siguientes: \textit{ChatGPT} de \textit{OpenAI} y \textit{Gemini} de \textit{Google}.
 
 \bibliographystyle{unsrt}
 \bibliography{references}
 
 \end{document}
-end{document}
